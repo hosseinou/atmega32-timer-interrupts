@@ -1,27 +1,36 @@
-# ATmega32 Precision Timing & Interrupts
+# Bare-Metal ATmega32: Precision Timing & Interrupts
 
-An embedded C project demonstrating bare-metal register configuration, asynchronous hardware interrupts, and precision pulse generation on an ATmega32 AVR microcontroller. This was completed as part of the Microprocessor Laboratory coursework.
+This repository contains my implementation for **Experiment 3** of the Microprocessor Laboratory course during my Bachelor's degree. The project focuses on bare-metal register configuration, asynchronous hardware interrupts, and deterministic pulse generation on an ATmega32 AVR microcontroller.
 
-## Core Implementations
-1. **Precision Square Wave:** Timer 1 is configured in Compare Match mode. Given a 1 MHz clock, the 16-bit `OCR1A` register is loaded with `0x01F4` (500) to trigger an Interrupt Service Routine (ISR) exactly every 0.5 ms, generating a highly accurate 1 kHz square wave on pin `PB2`.
-2. **Asynchronous Control:** External Interrupt 0 (`INT0`) is configured to catch falling edges from a push-button. Its ISR dynamically toggles the square wave generator on and off without blocking the main CPU execution.
-3. **External Event Counting:** Timer 0 is configured as an asynchronous counter, registering physical pulses and displaying the live tally on a $16 \times 2$ Alphanumeric LCD.
+## System Architecture & Core Logic
 
-## Hardware Configuration (Pin Mapping)
-Since this project interfaces directly with bare-metal hardware, the microcontroller pins were mapped as follows:
+### 1. Precision Square Wave Generation (Timer 1)
+Instead of relying on blocking software delay functions, this system utilizes **Timer 1** in Output Compare Match mode to generate a precise 1 kHz square wave, freeing up the ALU for other tasks. 
+* **The Math:** With a system clock of $1\text{ MHz}$ and no prescaling (`TCCR1B = 0x01`), the timer increments every $1\text{ \mu s}$. To toggle the pin every $0.5\text{ ms}$ (creating a $1\text{ ms}$ full period), the target tick count is $500$.
+* **Register Setup:** The 16-bit Output Compare Register (`OCR1A`) is loaded with `0x01F4` ($500$ in decimal). When `TCNT1` matches this value, a hardware interrupt (`TIM1_COMPA`) is triggered to toggle the output pin.
 
-| Component / Function | ATmega32 Pin | Register Configuration |
-| :--- | :--- | :--- |
-| **Square Wave Output** | `PB2` | Configured as Output (`DDRB = 0x04`) |
-| **External Counter Input** | `PB0` (`T0`) | Configured for Timer 0 falling edge |
-| **Toggle Push-Button** | `PD2` (`INT0`) | Triggers External Interrupt 0 |
-| **LCD Data & Control** | `PORTA` | Handled via `lcd.h` (`_lcd_port=0x1A`) |
+### 2. Asynchronous Control (External Interrupt 0)
+The system must respond immediately to user input without constantly polling a pin state.
+* **Configuration:** External Interrupt 0 (`INT0`) is enabled and configured to trigger on the falling edge of the signal (`MCUCR = 0x02`). 
+* **State Toggling:** The Interrupt Service Routine (ISR) executes dynamically to toggle a `pulse_enable` state flag. This guarantees an immediate response to the push-button without halting the main execution loop.
+
+### 3. External Event Counting (Timer 0)
+**Timer 0** is disconnected from the internal clock and configured as an asynchronous counter (`TCCR0 = 0x06`). It registers physical pulses on the external `T0` pin, incrementing its internal register (`TCNT0`) on every falling edge. The live tally is continuously polled in the main loop and pushed to a $16 \times 2$ Alphanumeric LCD.
+
+## Hardware Mapping & Register Setup
+
+| Peripheral | ATmega32 Pin | Register Setup | Function |
+| :--- | :--- | :--- | :--- |
+| **Pulse Output** | `PB2` | `DDRB = 0x04` | Toggles state via Timer 1 ISR |
+| **Counter Input** | `PB0` (`T0`) | `TCCR0 = 0x06` | Triggers Timer 0 on falling edge |
+| **Control Button** | `PD2` (`INT0`) | `MCUCR = 0x02`, `GICR \|= 0x40` | Triggers INT0 ISR |
+| **LCD Bus** | `PORTA` | `_lcd_port=0x1A` | Handles parallel display data |
 
 ## Repository Structure
-* `/1_base_system`: Initial implementation featuring a permanent one-way cutoff switch when the interrupt is triggered. Contains the original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation files used during the lab.
-* `/2_toggle_upgrade`: Upgraded logic allowing repeatable ON/OFF toggling via the `INT0` hardware interrupt.Contains the original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation files used during the lab.
+* `/1_base_system`: Initial lab implementation featuring a permanent one-way cutoff switch when the interrupt is triggered. Original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation workspaces used during the lab.
+* `/2_toggle_upgrade`: Upgraded logical flow allowing repeatable ON/OFF toggling via the `INT0` hardware interrupt. Original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation workspaces used during the lab. 
 
-## Software & Tools Used
-* **IDE:** CodeVisionAVR (C compiler)
-* **Simulation:** Proteus Professional
+## Toolchain
 * **Target Hardware:** 8-bit Microchip ATmega32
+* **Firmware:** Embedded C (compiled via CodeVisionAVR)
+* **Simulation:** Proteus Professional
