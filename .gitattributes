@@ -1,10 +1,22 @@
-# Force GitHub to recognize C files correctly
+# Force C language
 *.c linguist-language=C
 *.h linguist-language=C
 
-# Tell GitHub to ignore IDE and simulation files for language statistics
+# Ignore IDE config files
 *.prj linguist-generated
 *.pdsprj linguist-generated
 *.cwp linguist-generated
 *.atsln linguist-generated
 *.cci linguist-generated
+*.fct linguist-generated
+
+# Ignore compiled artifacts that trigger Perl/Assembly
+*.al linguist-generated
+*.ol linguist-generated
+*.a linguist-generated
+*.o linguist-generated
+*.hex linguist-generated
+*.cof linguist-generated
+*.asm linguist-generated
+*.lst linguist-generated
+*.rom linguist-generated
