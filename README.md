@@ -18,7 +18,7 @@ Since this project interfaces directly with bare-metal hardware, the microcontro
 | **LCD Data & Control** | `PORTA` | Handled via `lcd.h` (`_lcd_port=0x1A`) |
 
 ## Repository Structure
-* `/1_base_system`: The base project[cite: 5]. The `c.c` file configures Timer 1 to generate a 1kHz square wave and Timer 0 to count external pulses[cite: 5]. An external interrupt is used to permanently stop the wave[cite: 5]
+* `/1_base_system`: Initial implementation featuring a permanent one-way cutoff switch when the interrupt is triggered. Contains the original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation files used during the lab.
 * `/2_toggle_upgrade`: Upgraded logic allowing repeatable ON/OFF toggling via the `INT0` hardware interrupt.Contains the original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation files used during the lab.
 
 ## Software & Tools Used
