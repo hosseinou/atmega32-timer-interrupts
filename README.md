@@ -5,9 +5,9 @@ This repository contains my implementation for **Experiment 3** of the Microproc
 ## System Architecture & Core Logic
 
 ### 1. Precision Square Wave Generation (Timer 1)
-Instead of relying on blocking software delay functions, this system utilizes **Timer 1** in Output Compare Match mode to generate a precise 1 kHz square wave, freeing up the ALU for other tasks. 
-* **The Math:** With a system clock of $1\text{ MHz}$ and no prescaling (`TCCR1B = 0x01`), the timer increments every $1\text{ \mu s}$. To toggle the pin every $0.5\text{ ms}$ (creating a $1\text{ ms}$ full period), the target tick count is $500$.
-* **Register Setup:** The 16-bit Output Compare Register (`OCR1A`) is loaded with `0x01F4` ($500$ in decimal). When `TCNT1` matches this value, a hardware interrupt (`TIM1_COMPA`) is triggered to toggle the output pin.
+Instead of relying on blocking software delay functions, this system utilizes **Timer 1** in Output Compare Match mode to generate a precise **1 kHz** square wave, freeing up the ALU for other tasks. 
+* **The Math:** With a system clock of **1 MHz** and no prescaling (`TCCR1B = 0x01`), the timer increments every **1 µs**. To toggle the pin every **0.5 ms** (creating a **1 ms** full period), the target tick count is **500**.
+* **Register Setup:** The 16-bit Output Compare Register (`OCR1A`) is loaded with `0x01F4` (**500** in decimal). When `TCNT1` matches this value, a hardware interrupt (`TIM1_COMPA`) is triggered to toggle the output pin.
 
 ### 2. Asynchronous Control (External Interrupt 0)
 The system must respond immediately to user input without constantly polling a pin state.
@@ -15,7 +15,7 @@ The system must respond immediately to user input without constantly polling a p
 * **State Toggling:** The Interrupt Service Routine (ISR) executes dynamically to toggle a `pulse_enable` state flag. This guarantees an immediate response to the push-button without halting the main execution loop.
 
 ### 3. External Event Counting (Timer 0)
-**Timer 0** is disconnected from the internal clock and configured as an asynchronous counter (`TCCR0 = 0x06`). It registers physical pulses on the external `T0` pin, incrementing its internal register (`TCNT0`) on every falling edge. The live tally is continuously polled in the main loop and pushed to a $16 \times 2$ Alphanumeric LCD.
+**Timer 0** is disconnected from the internal clock and configured as an asynchronous counter (`TCCR0 = 0x06`). It registers physical pulses on the external `T0` pin, incrementing its internal register (`TCNT0`) on every falling edge. The live tally is continuously polled in the main loop and pushed to a **16x2 Alphanumeric LCD**.
 
 ## Hardware Mapping & Register Setup
 
@@ -27,8 +27,8 @@ The system must respond immediately to user input without constantly polling a p
 | **LCD Bus** | `PORTA` | `_lcd_port=0x1A` | Handles parallel display data |
 
 ## Repository Structure
-* `/1_base_system`: Initial lab implementation featuring a permanent one-way cutoff switch when the interrupt is triggered. Original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation workspaces used during the lab.
-* `/2_toggle_upgrade`: Upgraded logical flow allowing repeatable ON/OFF toggling via the `INT0` hardware interrupt. Original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation workspaces used during the lab. 
+* `/part_1_base_system`: Initial lab implementation featuring a permanent one-way cutoff switch when the interrupt is triggered. Original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation workspaces used during the lab.
+* `/part_2_toggle_upgrade`: Upgraded logical flow allowing repeatable ON/OFF toggling via the `INT0` hardware interrupt. Original CodeVisionAVR (`.prj`) configurations and Proteus ISIS (`.pdsprj`) circuit simulation workspaces used during the lab. 
 
 ## Toolchain
 * **Target Hardware:** 8-bit Microchip ATmega32
