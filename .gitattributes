@@ -1,22 +1,25 @@
-# Force C language
-*.c linguist-language=C
-*.h linguist-language=C
+# Ignore CodeVisionAVR build folders and artifacts
+Debug/
+Release/
+*.cof
+*.cwp
+*.cci
+*.fct
+*.atsln
+*~
 
-# Ignore IDE config files
-*.prj linguist-generated
-*.pdsprj linguist-generated
-*.cwp linguist-generated
-*.atsln linguist-generated
-*.cci linguist-generated
-*.fct linguist-generated
+# Ignore compiled binaries and assembly
+*.hex
+*.rom
+*.obj
+*.o
+*.al
+*.ol
+*.asm
+*.lst
+*.map
+*.sym*
 
-# Ignore compiled artifacts that trigger Perl/Assembly
-*.al linguist-generated
-*.ol linguist-generated
-*.a linguist-generated
-*.o linguist-generated
-*.hex linguist-generated
-*.cof linguist-generated
-*.asm linguist-generated
-*.lst linguist-generated
-*.rom linguist-generated
+# Ignore Proteus backups and workspaces
+*.pdsbak
+*.workspace
